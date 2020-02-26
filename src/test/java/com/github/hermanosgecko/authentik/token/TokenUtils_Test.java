@@ -1,4 +1,4 @@
-package com.github.hermanosgecko.token;
+package com.github.hermanosgecko.authentik.token;
 
 import java.time.Instant;
 
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import com.github.hermanosgecko.authentik.token.TokenException;
 import com.github.hermanosgecko.authentik.token.TokenUtils;
 
-public class TokenUtil_Test {
+public class TokenUtils_Test {
 
 	@Test
 	public void createHMACTest() throws Exception {
