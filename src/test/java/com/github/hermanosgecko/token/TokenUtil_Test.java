@@ -1,4 +1,4 @@
-package io.one9.token;
+package com.github.hermanosgecko.token;
 
 import java.time.Instant;
 
