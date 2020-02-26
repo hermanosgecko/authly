@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="favicon.ico">
+
+    <title>Sign in</title>
+
+	<link href="bootstrap.min.css" rel="stylesheet" >
+    <link href="style.css" rel="stylesheet">
+  </head>
+
+  <body class="text-center">
+    <form class="form-signin" action="login" method="post">
+      <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+      <label for="username" class="sr-only">Username</label>
+      <input type="text" name="username" class="form-control" placeholder="Username" required autofocus>
+      <label for="password" class="sr-only">Password</label>
+      <input type="password" name="password" class="form-control" placeholder="Password" required>
+       <input type="hidden" id="redirect_uri" name="redirect_uri"/>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+  </body>
+  
+  <script>
+  function getRedirectUri() {
+	    url = window.location.href;
+	    name = name.replace(/[\[\]]/g, '\\$&');
+	    var regex = new RegExp('[?&]' + 'redirect_uri' + '(=([^&#]*)|&|#|$)'),
+	        results = regex.exec(url);
+	    if (!results) return null;
+	    if (!results[2]) return '';
+	    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+	}
+  document.getElementById("redirect_uri").value = getRedirectUri();
+  </script>
+</html>

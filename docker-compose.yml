@@ -1,0 +1,63 @@
+version: '3.5'
+services:
+
+  traefik:
+    image: traefik:1.7
+    command: --web --docker --docker.domain=docker.localhost --logLevel=DEBUG
+    depends_on:
+    - "auth"
+    ports:
+    - "80:80"
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /dev/null:/traefik.toml
+    networks:
+      traefik-net:
+      public-net:
+    labels:
+    - "traefik.port=8080"
+    - "traefik.frontend.rule=Host:traefik.docker.localhost"
+    - "traefik.frontend.auth.forward.address=http://auth:4567/auth"
+    - "traefik.frontend.auth.forward.trustForwardHeader=true"
+    - "traefik.frontend.auth.forward.authResponseHeaders=X-Forwarded-User"
+    
+  portainer:
+    image: portainer/portainer
+    command: --no-auth
+    depends_on:
+    - "traefik"
+    - "auth"
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      traefik-net:
+    labels:
+    - "traefik.port=9000"
+    - "traefik.frontend.rule=Host:portainer.docker.localhost"
+    - "traefik.frontend.auth.forward.address=http://auth:4567/auth"
+    - "traefik.frontend.auth.forward.trustForwardHeader=true"
+    - "traefik.frontend.auth.forward.authResponseHeaders=X-Forwarded-User"
+    
+  auth:
+    image: hermanosgecko/authentik:latest
+    networks:
+      traefik-net:
+        aliases:
+        - "auth"
+    environment:
+     COOKIE_DOMAIN: docker.localhost
+     AUTH_HOST: auth.docker.localhost
+     SECRET: SECRET_TEXT
+    volumes:
+     - ${PWD}/htpasswd:/htpasswd:ro
+    labels:
+    - "traefik.port=4567"
+    - "traefik.frontend.rule=Host:auth.docker.localhost"
+    - "traefik.frontend.auth.forward.address=http://auth:4567/auth"
+    - "traefik.frontend.auth.forward.trustForwardHeader=true"
+    - "traefik.frontend.auth.forward.authResponseHeaders=X-Forwarded-User"
+
+networks:
+  traefik-net:
+    internal: true
+  public-net:
