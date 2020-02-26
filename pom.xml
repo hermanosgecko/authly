@@ -55,20 +55,30 @@
 				</executions>
 			</plugin>
 
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+			</plugin>
+      
 		</plugins>
 	</build>
 
 	<properties>
+		<!-- PROJECT SPECIFIC -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-		<!-- <maven.compiler.release>8</maven.compiler.release> ! -->
 		<java.version>1.8</java.version>
+		<!-- <maven.compiler.release>8</maven.compiler.release> ! -->
+		
+		<!--  PLUGINS -->
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 		<spring-boot.version>2.2.4.RELEASE</spring-boot.version>
-
+	
+		<!-- TEST -->
 		<org.junit.jupiter.version>5.6.0</org.junit.jupiter.version>
 
+		<!-- DEPENDENCIES -->
 		<com.sparkjava.version>2.9.1</com.sparkjava.version>
 		<org.slf4j.version>1.7.30</org.slf4j.version>
 		<commons-codec.version>1.14</commons-codec.version>
@@ -79,11 +89,18 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${org.junit.jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- 
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
 			<version>${org.junit.jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
-
+		!-->
 		<dependency>
 			<groupId>com.sparkjava</groupId>
 			<artifactId>spark-core</artifactId>
