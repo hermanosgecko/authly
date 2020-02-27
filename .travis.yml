@@ -3,4 +3,4 @@ jdk:
   - openjdk8
 script: mvn clean verify
 after_success:
-  - mvn -Ptravis clean verify jacoco:report coveralls:report
+  - mvn -Pjacoco -Pcoveralls clean verify jacoco:report coveralls:report
