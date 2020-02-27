@@ -199,6 +199,15 @@
 						<groupId>org.eluder.coveralls</groupId>
 						<artifactId>coveralls-maven-plugin</artifactId>
 						<version>${org.eluder.coveralls.version}</version>
+						<executions>
+							<execution>
+								<id>report</id>
+								<phase>test</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>

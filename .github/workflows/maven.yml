@@ -14,10 +14,4 @@ jobs:
       with:
         java-version: 1.8
     - name: Build with Maven
-      run: mvn -P jacoco -B package --file pom.xml
-      
-    - name: Coveralls
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: "./target/site/jacoco/jacoco.xml"
+      run: mvn -P jacoco,coveralls -B package --file pom.xml -DrepoToken=${{ secrets.COVERALLS_REPO_TOKEN }}
