@@ -139,9 +139,11 @@
 								<image>
 									<name>%g/%a:%l</name>
 									<alias>auth</alias>
+									<build>
+										<dockerFile>${project.basedir}/Dockerfile.maven</dockerFile>								
+									</build>
 								</image>
 							</images>
-
 						</configuration>
 						<executions>
 							<execution>
@@ -177,7 +179,7 @@
 							</execution>
 							<execution>
 								<id>report</id>
-								<phase>test</phase>
+								<phase>verify</phase>
 								<goals>
 									<goal>report</goal>
 								</goals>
@@ -202,7 +204,7 @@
 						<executions>
 							<execution>
 								<id>report</id>
-								<phase>test</phase>
+								<phase>verify</phase>
 								<goals>
 									<goal>report</goal>
 								</goals>
