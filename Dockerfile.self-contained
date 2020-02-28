@@ -1,6 +1,14 @@
+FROM alpine/git as git
+
+ARG BRANCH=master
+
+WORKDIR /tmp
+
+RUN git clone -b ${BRANCH} https://github.com/hermanosgecko/authentik.git
+
 FROM maven:3-jdk-8-alpine as builder
 
-COPY . /tmp
+COPY --from=git /tmp/authentik /tmp
 
 WORKDIR /tmp
 

@@ -140,7 +140,7 @@
 									<name>%g/%a:%l</name>
 									<alias>auth</alias>
 									<build>
-										<dockerFile>${project.basedir}/Dockerfile.maven</dockerFile>								
+										<dockerFile>${project.basedir}/Dockerfile</dockerFile>								
 									</build>
 								</image>
 							</images>
