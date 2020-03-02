@@ -46,9 +46,10 @@ public class App {
 	private static final UserService userService = new UserService();
 
 	private static String cookieDomain;
+	private static boolean insecureCookie = false;
 	private static String authHost;
-	private static int validityPeriod;
-	private static String pwdFile;
+	private static int cookieLifetime = 86400;
+	private static String pwdFile = "/htpasswd";
 	private static String secret;
 
 	public static void main(String[] args) {
@@ -57,34 +58,46 @@ public class App {
 
 		// create command line options
 		final Options options = new Options()
-				.addOption(Option.builder("c")
+				.addOption(Option.builder()
+						.longOpt("cookie-domain")
 						.desc("cookie domain")
 						.hasArg()
 						.required()
 						.type(String.class)
 						.build())
-				.addOption(Option.builder("h")
+				.addOption(Option.builder("i")
+						.longOpt("insecure-cookie")
+						.desc("insecure cookie")
+						.hasArg()
+						//.required()
+						.type(Boolean.class)
+						.build())
+				.addOption(Option.builder()
+						.longOpt("auth-host")
 						.desc("authentication hostname")
 						.hasArg()
 						.required()
 						.type(String.class)
 						.build())
-				.addOption(Option.builder("p")
+				.addOption(Option.builder()
+						.longOpt("lifetime")
 						.desc("validity period")
 						.hasArg()
-						.required()
+						//.required()
 						.type(Integer.class)
 						.build())
-				.addOption(Option.builder("f")
-						.desc("htpasswd file")
+				.addOption(Option.builder()
+						.longOpt("secret")
+						.desc("token secret")
 						.hasArg()
 						.required()
 						.type(String.class)
 						.build())
-				.addOption(Option.builder("s")
-						.desc("token secret")
+				.addOption(Option.builder()
+						.longOpt("file")
+						.desc("htpasswd file")
 						.hasArg()
-						.required()
+						//.required()
 						.type(String.class)
 						.build());
 
@@ -102,24 +115,34 @@ public class App {
 			return;
 		}
 
-		cookieDomain = cmd.getOptionValue("c");
+		cookieDomain = cmd.getOptionValue("cookie-domain");
 		LOGGER.info(MessageFormat.format("cookie domain set to {0}", cookieDomain ));
 
-		authHost = cmd.getOptionValue("h");
+		if(cmd.hasOption("insecure-cookie")) {
+			insecureCookie = Boolean.valueOf(cmd.getOptionValue("insecure-cookie"));
+		}
+		LOGGER.info(MessageFormat.format("insecure cookie set to {0}", insecureCookie ));
+
+		
+		authHost = cmd.getOptionValue("auth-host");
 		LOGGER.info(MessageFormat.format("auth host set to {0}", authHost ));
 
-		try {
-			validityPeriod = Integer.parseInt(cmd.getOptionValue("p"));
-			LOGGER.info(MessageFormat.format("validity period set to {0}", validityPeriod ));
-		} catch (NumberFormatException e) {
-			LOGGER.error("Unexpected error", e);
-			return;
+		if(cmd.hasOption("lifetime")) {
+			try {
+				cookieLifetime = Integer.valueOf(cmd.getOptionValue("lifetime"));
+			} catch (NumberFormatException e) {
+				LOGGER.error("Unexpected error", e);
+				return;
+			}
 		}
+		LOGGER.info(MessageFormat.format("lifetime set to {0,number,#}", cookieLifetime ));
 
-		pwdFile = cmd.getOptionValue("f");
+		if(cmd.hasOption("file")) {
+			pwdFile = cmd.getOptionValue("file");
+		}
 		LOGGER.info(MessageFormat.format("htpasswd file set to {0}", pwdFile ));
 
-		secret = cmd.getOptionValue("s");
+		secret = cmd.getOptionValue("secret");
 		LOGGER.info(MessageFormat.format("token secret set to {0}", secret ));
 
 		userService.setFileName(pwdFile);
@@ -166,7 +189,7 @@ public class App {
 		post("/login", (request, response) -> {
 
 			final String redirect_uri = request.queryParams("redirect_uri");
-			final String username = request.queryParams("username");
+			final String username = request.queryParams("login");
 			final String password = request.queryParams("password");
 
 			if(redirect_uri == null ||  username == null || password == null) {
@@ -177,8 +200,8 @@ public class App {
 			if(userService.authenticate(username, password)) {
 				response.removeCookie(COOKIE_NAME);
 
-				String token = TokenUtils.create(secret, cookieDomain, username, Instant.now().plusSeconds(validityPeriod).toEpochMilli());          	
-				response.cookie(cookieDomain, "/", COOKIE_NAME, token, validityPeriod, false, false);
+				String token = TokenUtils.create(secret, cookieDomain, username, Instant.now().plusSeconds(cookieLifetime).toEpochMilli());          	
+				response.cookie(cookieDomain, "/", COOKIE_NAME, token, cookieLifetime, !insecureCookie, true);
 				response.header("X-Forwarded-User", username);
 
 				response.redirect(redirect_uri);

@@ -40,14 +40,11 @@ services:
     
   auth:
     image: hermanosgecko/authentik:latest
+    command: --cookie-domain=docker.localhost --auth-host=auth.docker.localhost --secret=SECRET_TEXT --insecure-cookie=true
     networks:
       traefik-net:
         aliases:
         - "auth"
-    environment:
-     COOKIE_DOMAIN: docker.localhost
-     AUTH_HOST: auth.docker.localhost
-     SECRET: SECRET_TEXT
     volumes:
      - ${PWD}/htpasswd:/htpasswd:ro
     labels:
