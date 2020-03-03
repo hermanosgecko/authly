@@ -26,8 +26,8 @@ import java.time.Instant;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -57,49 +57,7 @@ public class App {
 		LOGGER.info("Starting");
 
 		// create command line options
-		final Options options = new Options()
-				.addOption(Option.builder()
-						.longOpt("cookie-domain")
-						.desc("cookie domain")
-						.hasArg()
-						.required()
-						.type(String.class)
-						.build())
-				.addOption(Option.builder("i")
-						.longOpt("insecure-cookie")
-						.desc("insecure cookie")
-						.hasArg()
-						//.required()
-						.type(Boolean.class)
-						.build())
-				.addOption(Option.builder()
-						.longOpt("auth-host")
-						.desc("authentication hostname")
-						.hasArg()
-						.required()
-						.type(String.class)
-						.build())
-				.addOption(Option.builder()
-						.longOpt("lifetime")
-						.desc("validity period")
-						.hasArg()
-						//.required()
-						.type(Integer.class)
-						.build())
-				.addOption(Option.builder()
-						.longOpt("secret")
-						.desc("token secret")
-						.hasArg()
-						.required()
-						.type(String.class)
-						.build())
-				.addOption(Option.builder()
-						.longOpt("file")
-						.desc("htpasswd file")
-						.hasArg()
-						//.required()
-						.type(String.class)
-						.build());
+		final Options options = new OptionBuilder().getOptions();
 
 		// parse the command line arguments
 		CommandLineParser parser = new DefaultParser();
@@ -107,12 +65,16 @@ public class App {
 		try {
 			cmd = parser.parse( options, args);
 		} catch(MissingOptionException e) {
-			LOGGER.error(e.getLocalizedMessage());
+			new HelpFormatter().printHelp("Authentik [options]", options);
 			return;			
 		}
 		catch (ParseException e) {
 			LOGGER.error("Unexpected error", e);
 			return;
+		}
+		
+		if(cmd.hasOption("help")) {
+			 new HelpFormatter().printHelp("Authentik [options]", options);
 		}
 
 		cookieDomain = cmd.getOptionValue("cookie-domain");
