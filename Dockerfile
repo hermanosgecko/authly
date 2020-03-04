@@ -6,5 +6,4 @@ COPY target/*.jar /app.jar
 
 WORKDIR /
 
-ENTRYPOINT ["/usr/bin/java","-jar", "/app.jar"] 
-#--cookie-domain $COOKIE_DOMAIN --auth-host $AUTH_HOST --secret $SECRET
+ENTRYPOINT ["/usr/bin/java","-jar", "/app.jar"]

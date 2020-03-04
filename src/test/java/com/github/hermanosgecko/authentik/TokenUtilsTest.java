@@ -1,9 +1,12 @@
-package com.github.hermanosgecko.authentik.token;
+package com.github.hermanosgecko.authentik;
 
 import java.time.Instant;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import com.github.hermanosgecko.authentik.TokenException;
+import com.github.hermanosgecko.authentik.TokenUtils;
 
 public class TokenUtilsTest {
 

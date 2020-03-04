@@ -162,8 +162,6 @@ The user flow will be:
 4. User is redirected to `app10.test.com/home/page`
 5. Request is allowed
 
-Note: `auth-host`  must be a subdomain of `cookie-domain`
-
 Please note: You must ensure that `auth-host`  is a subdomain of `cookie-domain` and requests to your `auth-host` are routed to the authentik container, as demonstrated with the service labels in the [docker-compose.yml](https://github.com/hermanosgecko/authentik/blob/master/docker-compose.yml) example.
 ## License
 

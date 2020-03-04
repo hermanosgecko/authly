@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.hermanosgecko.authentik.user;
+package com.github.hermanosgecko.authentik;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,24 +34,21 @@ import org.slf4j.LoggerFactory;
 public class UserService {
 
 	private final Logger logger = LoggerFactory.getLogger(UserService.class);
+	
+	private final String fileName;
+    private final Map<String, String> htUsers = new ConcurrentHashMap<String, String>();
 
-	private String fileName;
 	private File htpasswdFile;
 	private volatile long lastModified;
 	
-    private final Map<String, String> htUsers = new ConcurrentHashMap<String, String>();
-
+    public UserService(String fileName) {
+    	this.fileName = fileName;
+    }
     /**
 	 * @return the fileName
 	 */
 	public String getFileName() {
 		return fileName;
-	}
-	/**
-	 * @param fileName the fileName to set
-	 */
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
 	}
 	
 	/**

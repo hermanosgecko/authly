@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.hermanosgecko.authentik.token;
+package com.github.hermanosgecko.authentik;
 
 public class TokenException extends Exception {
 
