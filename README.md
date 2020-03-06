@@ -1,5 +1,4 @@
-
-# authentik [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![Java CI](https://github.com/hermanosgecko/authentik/workflows/Java%20CI/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/hermanosgecko/authentik/badge.svg?branch=master)](https://coveralls.io/github/hermanosgecko/authentik?branch=master)  ![Docker Pulls](https://img.shields.io/docker/pulls/hermanosgecko/authentik.svg)  [![GitHub release](https://img.shields.io/github/release/hermanosgecko/authentik.svg)](https://Github.com/hermanosgecko/authentik/releases/)]
+# authentik [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![Java CI](https://github.com/hermanosgecko/authentik/workflows/Java%20CI/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/hermanosgecko/authentik/badge.svg?branch=master)](https://coveralls.io/github/hermanosgecko/authentik?branch=master)  ![Docker Pulls](https://img.shields.io/docker/pulls/hermanosgecko/authentik.svg)  [![GitHub release](https://img.shields.io/github/release/hermanosgecko/authentik.svg)](https://Github.com/hermanosgecko/authentik/releases/)
 A more minimal forward authentication service that provides login and authentication using an Apache basic authentication ([htpasswd](https://httpd.apache.org/docs/current/programs/htpasswd.html)) file for the [traefik](https://github.com/containous/traefik) reverse proxy/load balancer.
 
 Based on the concept for [traefik-forward-auth](https://github.com/thomseddon/traefik-forward-auth) but uses a file based provider in place of google/OIDC.
@@ -85,6 +84,7 @@ Container images are configured using parameters passed at runtime (such as thos
 
 | Parameter | Function |
 | :----: | --- |
+| `-p 4567` | The port for the authentik webinterface |
 | `-e COOKIE_DOMAIN=mydomain.com` | Domain for the cookie. This is required |
 | `-e AUTH_HOST=auth.mydomain.com` | Sub domain to access the login page for authentik, this must be a sub domain of the `COOKIE_DOMAIN` and should be specified without protocol or path.  This is required  |
 | `-e SECRET=THIS_IS_A_SECRET` | Used to sign cookies authentication, should be a random (e.g. `openssl rand -hex 16`).  This is required  |
