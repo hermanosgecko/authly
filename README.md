@@ -1,4 +1,5 @@
-# authentik [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![Java CI](https://github.com/hermanosgecko/authentik/workflows/Java%20CI/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/hermanosgecko/authentik/badge.svg?branch=master)](https://coveralls.io/github/hermanosgecko/authentik?branch=master)  ![Docker Pulls](https://img.shields.io/docker/pulls/hermanosgecko/authentik.svg)  [![GitHub release](https://img.shields.io/github/release/hermanosgecko/authentik.svg)](https://Github.com/hermanosgecko/authentik/releases/)
+
+# authentik [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![Java CI](https://github.com/hermanosgecko/authentik/workflows/Java%20CI/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/hermanosgecko/authentik/badge.svg?branch=master)](https://coveralls.io/github/hermanosgecko/authentik?branch=master)  ![Docker Pulls](https://img.shields.io/docker/pulls/hermanosgecko/authentik.svg)  [![GitHub release](https://img.shields.io/github/release/hermanosgecko/authentik.svg)](https://Github.com/hermanosgecko/authentik/releases/)]
 A more minimal forward authentication service that provides login and authentication using an Apache basic authentication ([htpasswd](https://httpd.apache.org/docs/current/programs/htpasswd.html)) file for the [traefik](https://github.com/containous/traefik) reverse proxy/load balancer.
 
 Based on the concept for [traefik-forward-auth](https://github.com/thomseddon/traefik-forward-auth) but uses a file based provider in place of google/OIDC.
@@ -13,6 +14,7 @@ docker-compose.yml:
 
 ```yaml
 version: '3'
+
 services:
   traefik:
     image: traefik:1.7
@@ -39,12 +41,11 @@ services:
     
   authentik:
     image: hermanosgecko/authentik:latest
-    command: [
-    "--cookie-domain=docker.localhost", 
-    "--auth-host=auth.docker.localhost", 
-    "--insecure-cookie=true",
-    "--secret=THIS_IS_A_SECRET"
-    ] # Example assumes no https, do not use in production
+    environment:
+     - INSECURE_COOKIE=true  # Example assumes no https, do not use in production
+     - COOKIE_DOMAIN=docker.localhost
+     - AUTH_HOST=auth.docker.localhost 
+     - SECRET=THIS_IS_A_SECRET 
     networks:
       traefik-net:
         aliases:
@@ -69,6 +70,7 @@ services:
     - "traefik.frontend.auth.forward.trustForwardHeader=true"
     - "traefik.frontend.auth.forward.authResponseHeaders=X-Forwarded-User"
 
+
 networks:
   traefik-net:
     internal: true
@@ -77,68 +79,19 @@ networks:
 ## Configuration
 
 ### Overview
+## Parameters
 
-The following configuration options are supported:
-```
-usage: Authentik [options]
-    --auth-host <arg>         External hostname to access login page (required)
-    --cookie-domain <arg>     Domain to set auth cookie on (required)
-    --file <arg>              Path & File name to use for htpasswd file (default: /htpasswd)
- -h,--help                    Show this help message
- -i,--insecure-cookie <arg>   Use insecure cookies
-    --lifetime <arg>          Lifetime in seconds (default: 86400)
-    --secret <arg>            Secret used for signing (required)
-```
+Container images are configured using parameters passed at runtime (such as those above). These parameters are separated by a colon and indicate `<external>:<internal>` respectively. For example, `-p 8080:80` would expose port `80` from inside the container to be accessible from the host's IP on port `8080` outside the container.
 
-### Option Details
-
-- `auth-host`
-
-  When a user accesses a restricted host they will be forwarded to this host to log in. 
-  The host should be specified without protocol or path, for example:
-
-   ```
-   --auth-host="auth.example.com"
-   ```
-
-- `cookie-domain`
-
-  When set, if a user successfully completes authentication, then if the host of the original request requiring authentication is a subdomain of a given cookie domain, then the authentication cookie will be set for the higher level cookie domain. This means that a cookie can allow access to multiple subdomains without re-authentication. 
-
-   For example:
-   ```
-   --cookie-domain="example.com"  --cookie-domain="test.org"
-   ```
-
-   For example, if the cookie domain `test.com` has been set, and a request comes in on `app1.test.com`, following authentication the auth cookie will be set for the whole `test.com` domain. As such, if another request is forwarded for authentication from `app2.test.com`, the original cookie will be sent and so the request will be allowed without further authentication.
-
-- `file`
-  
-  The path and filename for the users file to use.  The value should be relative to the container for example:
-
-   ```
-   --file="/htpasswd"
-   ```
-   
-   and for the container:
-   ```
-   ${PWD}/hostpath/htpasswd:/containerpath/htpasswd
-   ```
-The default value is `/htpasswd`
-
-- `insecure-cookie`
-
-   If you are not using HTTPS between the client and traefik, you will need to pass the `insecure-cookie` option which will mean the `Secure` attribute on the cookie will not be set.
-
-- `lifetime`
-
-   How long a successful authentication session should last, in seconds.
-
-   Default: `86400` (24 hours)
-
-- `secret`
-
-   Used to sign cookies authentication, should be a random (e.g. `openssl rand -hex 16`)
+| Parameter | Function |
+| :----: | --- |
+| `-e COOKIE_DOMAIN=mydomain.com` | Domain for the cookie. This is required |
+| `-e AUTH_HOST=auth.mydomain.com` | Sub domain to access the login page for authentik, this must be a sub domain of the `COOKIE_DOMAIN` and should be specified without protocol or path.  This is required  |
+| `-e SECRET=THIS_IS_A_SECRET` | Used to sign cookies authentication, should be a random (e.g. `openssl rand -hex 16`).  This is required  |
+| `-e COOKIE_NAME=tokenname` | Specify a cookie name. Defaulted to `authentik.token` |
+| `-e INSECURE_COOKIE=true` | If you are not using HTTPS between the client and traefik, you will need to pass this which will mean the `Secure` attribute on the cookie will not be set. Defaulted to `False`. |
+| `-e LIFETIME=86400` | How long a successful authentication session should last, in seconds. Defaulted to `86400` (24 hours) |
+| `-v /htpasswd` | Location of the htpasswd file|
    
  ## Concepts
 

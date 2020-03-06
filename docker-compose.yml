@@ -26,12 +26,11 @@ services:
     
   authentik:
     image: hermanosgecko/authentik:latest
-    command: [
-    "--cookie-domain=docker.localhost", 
-    "--auth-host=auth.docker.localhost", 
-    "--insecure-cookie=true",
-    "--secret=THIS_IS_A_SECRET"
-    ] # Example assumes no https, do not use in production
+    environment:
+     - INSECURE_COOKIE=true  # Example assumes no https, do not use in production
+     - COOKIE_DOMAIN=docker.localhost
+     - AUTH_HOST=auth.docker.localhost 
+     - SECRET=THIS_IS_A_SECRET 
     networks:
       traefik-net:
         aliases:

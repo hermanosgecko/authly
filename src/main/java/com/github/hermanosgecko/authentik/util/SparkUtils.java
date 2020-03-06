@@ -13,16 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.hermanosgecko.authentik;
+package com.github.hermanosgecko.authentik.util;
 
-public class TokenException extends Exception {
+import spark.Filter;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
-	private static final long serialVersionUID = 1L;
+public class SparkUtils {
 
-	public TokenException(String message) {
-		super(message);
-	}
-	public TokenException(String message, Throwable ex) {
-		super(message, ex);
-	}
+	public static Route notFound = (Request request, Response response) -> {
+		response.redirect("/auth", 301);
+		return response;
+	};
+	
+	// Enable GZIP for all responses
+    public static Filter addGzipHeader = (Request request, Response response) -> {
+        response.header("Content-Encoding", "gzip");
+    };
 }

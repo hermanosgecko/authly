@@ -1,0 +1,47 @@
+/*
+ * Copyright 2013-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.github.hermanosgecko.authentik.util;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import spark.Request;
+import spark.Response;
+
+public class SparkUtilsTest {
+
+	@Test
+	public void notFoundTest() throws Exception {
+		Request request = Mockito.mock(Request.class);
+		Response response = Mockito.mock(Response.class);
+		SparkUtils.notFound.handle(request, response);
+		
+		Mockito.verify(response).redirect("/auth", 301);
+		Mockito.verifyNoMoreInteractions(response);
+		Mockito.verifyNoInteractions(request);
+	}
+	
+	@Test
+	public void addGzipHeaderTest() throws Exception {
+		Request request = Mockito.mock(Request.class);
+		Response response = Mockito.mock(Response.class);
+		SparkUtils.addGzipHeader.handle(request, response);	
+		
+		Mockito.verify(response).header("Content-Encoding", "gzip");
+		Mockito.verifyNoMoreInteractions(response);
+		Mockito.verifyNoInteractions(request);
+	}
+}
