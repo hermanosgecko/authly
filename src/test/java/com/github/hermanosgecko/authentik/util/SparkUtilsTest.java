@@ -23,17 +23,7 @@ import spark.Response;
 
 public class SparkUtilsTest {
 
-	@Test
-	public void notFoundTest() throws Exception {
-		Request request = Mockito.mock(Request.class);
-		Response response = Mockito.mock(Response.class);
-		SparkUtils.notFound.handle(request, response);
-		
-		Mockito.verify(response).redirect("/auth", 301);
-		Mockito.verifyNoMoreInteractions(response);
-		Mockito.verifyNoInteractions(request);
-	}
-	
+
 	@Test
 	public void addGzipHeaderTest() throws Exception {
 		Request request = Mockito.mock(Request.class);

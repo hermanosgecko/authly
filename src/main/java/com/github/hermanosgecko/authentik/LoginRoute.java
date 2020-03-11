@@ -23,6 +23,7 @@ import com.github.hermanosgecko.authentik.util.TokenUtils;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+import static spark.Spark.halt;
 
 public class LoginRoute implements Route {
 
@@ -91,23 +92,21 @@ public class LoginRoute implements Route {
 		final String password = request.queryParams("password");
 
 		if(redirect_uri == null ||  username == null || password == null) {
-			response.status(503);
-			return response;
+			halt(400, "Missing required information");
 		}
 
-		if(userService.authenticate(username, password)) {
-			response.removeCookie(cookieName);
-
-			String token = TokenUtils.create(secret, cookieDomain, username, Instant.now().plusSeconds(cookieLifetime).toEpochMilli());          	
-			response.cookie(cookieDomain, "/", cookieName, token, cookieLifetime, !insecureCookie, true);
-			response.header(HttpHeaders.X_FORWARDED_USER, username);
-
-			response.redirect(redirect_uri);
-			return response;
+		if(!userService.authenticate(username, password)) {
+			// if not authenticated return error
+		    halt(401, "Unauthorized");
 		}
+		
+		response.removeCookie(cookieName);
 
-		// if not authenticated return error
-		response.status(401);
+		String token = TokenUtils.create(secret, cookieDomain, username, Instant.now().plusSeconds(cookieLifetime).toEpochMilli());          	
+		response.cookie(cookieDomain, "/", cookieName, token, cookieLifetime, !insecureCookie, true);
+		response.header(HttpHeaders.X_FORWARDED_USER, username);
+
+		response.redirect(redirect_uri);
 		return response;
 	}
 

@@ -40,9 +40,9 @@ services:
     labels:
     - "traefik.port=4567"
     - "traefik.frontend.rule=Host:auth.docker.localhost"
-    - "traefik.frontend.auth.forward.address=http://authentik:4567/auth"
-    - "traefik.frontend.auth.forward.trustForwardHeader=true"
-    - "traefik.frontend.auth.forward.authResponseHeaders=X-Forwarded-User"
+#    - "traefik.frontend.auth.forward.address=http://authentik:4567/auth"
+#    - "traefik.frontend.auth.forward.trustForwardHeader=true"
+#    - "traefik.frontend.auth.forward.authResponseHeaders=X-Forwarded-User"
 
   whoami:
     image: stefanscherer/whoami:latest

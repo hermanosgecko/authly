@@ -15,6 +15,8 @@
  */
 package com.github.hermanosgecko.authentik;
 
+import static spark.Spark.halt;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
@@ -74,36 +76,34 @@ public class AuthRoute implements Route {
 		final String fwd_host = request.headers(HttpHeaders.X_FORWARDED_HOST);
 		final String fwd_uri = request.headers(HttpHeaders.X_FORWARDED_URI);
 		final String fwd_method = request.headers(HttpHeaders.X_FORWARDED_METHOD);
-
+		
 		if(fwd_host == null || fwd_uri == null || fwd_method == null) {
-			response.status(503);
-			return response;
+			halt(400, "Missing required information");
 		}
 
 		if(fwd_host.equals(authHost)) {
-			response.status(200);
-			return response;
+			halt(200);
 		}
-
+		
 		final String token = request.cookie(cookieName);
 		try {
 
 			String user = TokenUtils.validate(secret, cookieDomain, token);
 			response.header(HttpHeaders.X_FORWARDED_USER, user);
 			response.status(200);
-			return response;
 
 		}catch(TokenException ex) {		      	
 			response.removeCookie(cookieName);
-			response.redirect(MessageFormat.format("http://{0}/?redirect_uri={1}", authHost, buildRedirectUri(request)),307);
-			return response;		
+			response.redirect(MessageFormat.format("http://{0}/?redirect_uri={1}", authHost, buildRedirectUri(request)));
 		}
+		return response;
 	}
 	
 	public String buildRedirectUri(Request request) {
 		final String proto = request.headers(HttpHeaders.X_FORWARDED_PROTO);
 		final String host = request.headers(HttpHeaders.X_FORWARDED_HOST);
 		final String uri = request.headers(HttpHeaders.X_FORWARDED_URI);
+
 		String redirect_uri = "";
 		try {
 			redirect_uri = URLEncoder.encode(MessageFormat.format("{0}://{1}{2}", proto, host, uri), "UTF-8");

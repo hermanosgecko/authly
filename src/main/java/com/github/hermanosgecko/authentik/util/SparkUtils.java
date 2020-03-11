@@ -18,14 +18,8 @@ package com.github.hermanosgecko.authentik.util;
 import spark.Filter;
 import spark.Request;
 import spark.Response;
-import spark.Route;
 
 public class SparkUtils {
-
-	public static Route notFound = (Request request, Response response) -> {
-		response.redirect("/auth", 301);
-		return response;
-	};
 	
 	// Enable GZIP for all responses
     public static Filter addGzipHeader = (Request request, Response response) -> {

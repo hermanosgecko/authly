@@ -17,7 +17,6 @@ package com.github.hermanosgecko.authentik;
 
 import static spark.Spark.after;
 import static spark.Spark.get;
-import static spark.Spark.notFound;
 import static spark.Spark.post;
 import static spark.Spark.staticFiles;
 
@@ -58,7 +57,7 @@ public class App {
 		} catch (MissingValueException | InvalidIntegerException ex) {
 			LOGGER.error(ex.getMessage());
 			return;
-		}	
+		}
 		
 		LOGGER.info(MessageFormat.format("{0} / {1}","cookieName", cookieName ));
 		LOGGER.info(MessageFormat.format("{0} / {1}","cookieDomain", cookieDomain ));
@@ -69,15 +68,13 @@ public class App {
 		LOGGER.info(MessageFormat.format("{0} / {1}","file", pwdFile ));
 	
 		staticFiles.location("/static");
-
-		notFound(SparkUtils.notFound);
 		
-		after("*",SparkUtils.addGzipHeader);
+		after("*", SparkUtils.addGzipHeader);
 
 		get("/auth", new AuthRoute(authHost, secret, cookieName, cookieDomain));
 
 		post("/login", new LoginRoute(new UserServiceImpl(pwdFile), secret, cookieName, cookieDomain, insecureCookie, cookieLifetime));
-		
+
 	}
 
 }
