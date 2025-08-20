@@ -1,0 +1,74 @@
+version: '3'
+
+services:
+
+  traefik:
+    image: "docker.io/library/traefik:latest"
+    container_name: "traefik"
+#    user: 1000:1000
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:8081"
+      - "--log.level=debug"
+    ports:
+      - "8081:8081"
+      - "8080:8080"
+    networks:
+      traefik:
+    security_opt:
+      - label=disable
+      - label=type:container_runtime_t
+#    cap_add:
+#    - ALL
+    privileged: true
+    volumes:
+#     - /run/user/1000/podman.sock:/var/run/docker.sock:ro
+    - $XDG_RUNTIME_DIR/podman/podman.sock:/var/run/docker.sock:ro,Z
+    labels:
+    - "traefik.port=8080"
+#    - "traefik.frontend.rule=Host:traefik.podman.localhost"
+#    - "traefik.frontend.auth.forward.address=http://authly:8080/auth"
+#    - "traefik.frontend.auth.forward.trustForwardHeader=true"
+#    - "traefik.frontend.auth.forward.authResponseHeaders=X-Forwarded-User"
+    
+  authly:
+    image: hermanosgecko/authly:latest
+    environment:
+     - QUARKUS_HTTP_AUTH_SESSION_ENCRYPTION_KEY=12345678901234567
+     - QUARKUS_HTTP_AUTH_FORM_COOKIE_DOMAIN=podman.localhost
+     - QUARKUS_SECURITY_USERS_EMBEDDED_USERS_TEST=test
+    networks:
+      traefik:
+    ports:
+      - 8282:8080
+    volumes:
+     - ${PWD}/htpasswd:/htpasswd:ro
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.authly.rule=Host(`auth.podman.localhost`)"
+    - "traefik.http.routers.authly.entrypoints=web"
+    #- "traefik.http.routers.authly.middlewares=authly@docker"
+    - "traefik.http.services.authly.loadbalancer.server.port=8080"
+    - "traefik.http.middlewares.authly.forwardauth.address=http://authly:8080/auth"
+    - "traefik.http.middlewares.authly.forwardauth.trustForwardHeader=true"
+    - "traefik.http.middlewares.authly.forwardauth.authResponseHeaders=Remote-User"
+    - "traefik.http.middlewares.authly.forwardauth.authRequestHeaders=Cookie"
+#    - "traefik.http.middlewares.authly.forwardauth.authRequestHeaders=X-Forwarded-Proto,X-Forwarded-Host,X-Forwarded-Port,X-Forwarded-Uri"
+
+  whoami:
+    image: "docker.io/traefik/whoami"
+    networks:
+      traefik:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.podman.localhost`)"
+      - "traefik.http.routers.whoami.entrypoints=web"
+      - "traefik.http.routers.whoami.middlewares=authly@docker"
+      - "traefik.http.services.whoami.loadbalancer.server.port=80"
+
+
+networks:
+  traefik:
+    internal: false

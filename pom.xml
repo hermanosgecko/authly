@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.github.hermanosgecko</groupId>
-	<artifactId>authentik</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>authly</artifactId>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>authentik</name>
+	<name>authly</name>
 	<description />
 
 	<licenses>
@@ -26,6 +26,98 @@
 		<url>https://github.com/hermanosgecko/authentik</url>
 	</scm>
 
+	<properties>
+		<!-- PROJECT SPECIFIC -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		
+		<!-- JAVA SETTINGS -->
+		<java.version>21</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+
+		<!-- PLUGINS -->
+		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
+		<spring-boot.version>2.2.4.RELEASE</spring-boot.version>
+
+		<!-- QUARKUS -->
+		<quarkus.platform.version>3.25.3</quarkus.platform.version>
+		<quarkus.container-image.build>true</quarkus.container-image.build>
+		<quarkus.container-image.group>hermanosgecko</quarkus.container-image.group>
+		<quarkus.container-image.name>authly</quarkus.container-image.name>
+		<quarkus.container-image.tag>latest</quarkus.container-image.tag>
+
+
+		<!-- DEPENDENCIES -->
+		<bootstrap.version>5.3.7</bootstrap.version>
+
+	</properties>
+
+  	<dependencyManagement>
+		<dependencies>
+			<!-- QUARKUS BOM -->
+			<dependency>
+				<groupId>io.quarkus</groupId>
+				<artifactId>quarkus-bom</artifactId>
+				<version>${quarkus.platform.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+		
+	<dependencies>
+		<!-- QUARKUS -->
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-container-image-podman</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-elytron-security-properties-file</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-rest</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-rest-qute</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-web-dependency-locator</artifactId>
+		</dependency>
+
+		<!-- CODECS FOR PASSWORDS -->
+		<!-- FROM QUARKUS-BOM -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk18on</artifactId>
+		</dependency>
+
+		<!-- BOOTSTRAP FOR UI -->
+		<dependency>
+			<groupId>org.mvnpm</groupId>
+			<artifactId>bootstrap</artifactId>
+			<version>${bootstrap.version}</version>
+		</dependency>
+
+		<!-- TEST DEPENDENCIES -->
+      <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-junit5-mockito</artifactId>
+		<scope>test</scope>
+      </dependency>
+
+	</dependencies>
+
 	<build>
 		<plugins>
 
@@ -33,24 +125,20 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
 			</plugin>
 
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring-boot.version}</version>
+			<plugin> 
+				<groupId>io.quarkus</groupId>
+				<artifactId>quarkus-maven-plugin</artifactId>
+				<version>${quarkus.platform.version}</version>
+				<extensions>true</extensions> 
 				<executions>
 					<execution>
 						<goals>
-							<goal>repackage</goal>
+							<goal>build</goal>
+							<goal>generate-code</goal>
+							<goal>generate-code-tests</goal>
 						</goals>
-						<configuration>
-							<mainClass>com.github.hermanosgecko.authentik.App</mainClass>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -59,80 +147,24 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<systemPropertyVariables>
+						<native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
+						<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+						<maven.home>${maven.home}</maven.home>
+					</systemPropertyVariables>
+				</configuration>
 			</plugin>
 
 		</plugins>
 	</build>
 
-	<properties>
-		<!-- PROJECT SPECIFIC -->
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
-		<!-- <maven.compiler.release>8</maven.compiler.release> ! -->
-
-		<!-- PLUGINS -->
-		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-		<spring-boot.version>2.2.4.RELEASE</spring-boot.version>
-
-		<!-- TEST -->
-		<org.junit.jupiter.version>5.6.0</org.junit.jupiter.version>
-		<org.mockito.version>3.3.0</org.mockito.version>
-
-		<!-- DEPENDENCIES -->
-		<com.sparkjava.version>2.9.1</com.sparkjava.version>
-		<org.slf4j.version>1.7.30</org.slf4j.version>
-		<commons-codec.version>1.14</commons-codec.version>
-
-	</properties>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<version>${org.junit.jupiter.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>${org.mockito.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.sparkjava</groupId>
-			<artifactId>spark-core</artifactId>
-			<version>${com.sparkjava.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${org.slf4j.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>${commons-codec.version}</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.webjars</groupId>
-		    <artifactId>bootstrap</artifactId>
-		    <version>4.4.1-1</version>
-		</dependency>
-
-	</dependencies>
-
 
 	<profiles>
 		<profile>
-			<id>docker</id>
+			<id>DOCKER</id>
 			<properties>
-				<docker-plugin.version>0.33.0</docker-plugin.version>
+				<docker-plugin.version>0.46.0</docker-plugin.version>
 			</properties>
 			<build>
 				<plugins>
@@ -168,7 +200,7 @@
 		<profile>
 			<id>jacoco</id>
 			<properties>
-				<org.jacoco.version>0.8.5</org.jacoco.version>
+				<org.jacoco.version>0.8.13</org.jacoco.version>
 			</properties>
 			<build>
 				<plugins>

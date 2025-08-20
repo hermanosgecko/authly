@@ -1,4 +1,7 @@
-FROM openjdk:8-jre-alpine
+#FROM openjdk:8-jre-alpine
+#FROM eclipse-temurin:8-jre-ubi9-minimal
+FROM eclipse-temurin:21-jre-ubi9-minimal
+
 
 EXPOSE 4567/tcp
 
@@ -12,4 +15,4 @@ COPY target/*.jar /app.jar
 
 WORKDIR /
 
-ENTRYPOINT ["/usr/bin/java","-jar", "/app.jar"]
+CMD ["java","-jar", "/app.jar"]
