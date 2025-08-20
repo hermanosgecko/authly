@@ -44,13 +44,12 @@ public class LogoutResource {
         if (identity.isAnonymous()) {
             throw new UnauthorizedException("Not authenticated");
         }
-        logger.log(Level.INFO, "Identity {0}", identity);
         logger.log(Level.INFO, "User {0}", identity.getPrincipal().getName());
 
-        FormAuthenticationMechanism.logout(identity); 
         URI redirectTo = UriBuilder.fromResource(IndexResource.class).build();
-
         logger.log(Level.INFO, "Redirect URI {0}", redirectTo.toString());
+
+        FormAuthenticationMechanism.logout(identity); 
         return Response.status(Status.FOUND).location(redirectTo).build();
     }
 

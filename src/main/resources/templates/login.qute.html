@@ -1,5 +1,4 @@
 {#include index}
-<!--<form id="loginForm" onsubmit="return doLogin()">-->
 <form id="loginForm">
   <div class="mb-3">
     <label for="j_username" class="form-label">Username</label>
@@ -12,7 +11,6 @@
   <button type="submit" class="btn btn-primary">Login</button>
 </form>
 <script>
-
 document.getElementById("loginForm").onsubmit = async (event) => {
     // stop the form submitting itself
     event.preventDefault();
