@@ -1,59 +1,46 @@
 {#include index}
-<form id="loginForm" onsubmit="return doLogin()">
+<!--<form id="loginForm" onsubmit="return doLogin()">-->
+<form id="loginForm">
   <div class="mb-3">
     <label for="j_username" class="form-label">Username</label>
-    <input type="text" class="form-control" id="j_username" required>
+    <input type="text" class="form-control" id="j_username" name="j_username" required>
   </div>
   <div class="mb-3">
     <label for="j_password" class="form-label">Password</label>
-    <input type="password" class="form-control" id="j_password">
+    <input type="password" class="form-control" id="j_password" name="j_password">
   </div>
   <button type="submit" class="btn btn-primary">Login</button>
 </form>
 <script>
-function doLogin(){
-    // Create an object to represent the form data
-    const formData = new URLSearchParams();
-    formData.append("j_username", document.getElementById("j_password").value);
-    formData.append("j_password", document.getElementById("j_password").value);
 
-    //const form = document.getElementById("loginForm");
-    //const formData = new FormData(form);
-
-    console.log(formData);
+document.getElementById("loginForm").onsubmit = async (event) => {
+    // stop the form submitting itself
+    event.preventDefault();
 
     // Make an HTTP POST request using fetch against j_security_check endpoint
-    fetch("j_security_check", {
-        method: "POST",
-        body: formData,
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
+    fetch('/j_security_check', {
+        method: 'POST',
+        body: new FormData(event.target)
     })
     .then((response) => {
-        if (response.status === 200) {
+        if(response.ok){
             // Authentication was successful
-            console.log("Authentication successful");
+            // Get the url params
+            const urlParams = new URLSearchParams(window.location.search);
 
-            doRedirect();
+            // Get the redirect_uri if avaiable else default to "/"
+            const redirectUri = urlParams.get('redirect_uri') ? urlParams.get('redirect_uri') : "/";
+            
+            // redirect to the uri
+            window.location.href = redirectUri;
         } else {
             // Authentication failed
+            //TODO display alert
             console.error("Invalid credentials");
         }
     })
     .catch((error) => {
         console.error(error);
     });
-    return false;
-};
-
-function doRedirect(){
-    // Get the url params
-    const urlParams = new URLSearchParams(window.location.search);
-
-    // Get the redirect_uri if avaiable else default to "/"
-    const redirectUri = urlParams.get('redirect_uri') ? urlParams.get('redirect_uri') : "/";
-    
-    window.location.href = redirectUri;
 }
 </script>
