@@ -22,6 +22,8 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -40,6 +42,14 @@ public class AuthResource {
     private final Logger LOGGER = System.getLogger(AuthResource.class.getName());
 
     @Inject
+    @ConfigProperty(name="authly.host")
+    String authlyHost;
+
+    @Inject
+    @ConfigProperty(name="authly.user.header")
+    String authlyUserHeader;
+
+    @Inject
     SecurityIdentity identity;
 
     @Context
@@ -51,54 +61,34 @@ public class AuthResource {
     @GET
     public Response get() 
     {
-        // LOG HEADERS
-        httpHeaders.getRequestHeaders().forEach((key,value)->{
-            LOGGER.log(Level.INFO, "HEADER - {0} - {1}",key, value);
-        });
-        
-        // LOG COOKIES
-        httpHeaders.getCookies().forEach((key,value)->{
-            LOGGER.log(Level.INFO, "COOKIE - {0} - {1}",key, value);
-        });
-
-        if(identity.isAnonymous()){
-            LOGGER.log(Level.INFO, "User Not Logged In");
-        }else{
-            LOGGER.log(Level.INFO, "User {0} Logged In", identity.getPrincipal().getName());
-        }
-  
         if (identity.isAnonymous()) {
-            LOGGER.log(Level.INFO, "Redirecting To Login Page");
+            LOGGER.log(Level.DEBUG, "Redirecting To Login Page");
             String fwd_proto = httpHeaders.getHeaderString("X-Forwarded-Proto");
             String fwd_host = httpHeaders.getHeaderString("X-Forwarded-Host");
             String fwd_uri = httpHeaders.getHeaderString("X-Forwarded-Uri");
 
             final String redirect_uri = buildRedirectUri(fwd_proto,fwd_host,fwd_uri);
 			
-            // NEED TO MAKE THE URI CONFIGURABLE
-            URI redirectToUri = UriBuilder.fromUri("http://auth.podman.localhost:8081/")
-                                    .queryParam("redirect_uri",redirect_uri)
+            URI redirectToUri = UriBuilder.fromUri(authlyHost+"/login")
+                                    .queryParam("redirect_uri", redirect_uri)
                                     .build();
 
-            LOGGER.log(Level.INFO, "Redirecting To {0}", redirectToUri);
+            LOGGER.log(Level.DEBUG, "Redirecting To {0}", redirectToUri);
             return Response.status(Status.FOUND).location(redirectToUri).build();
         }
 
         String user = identity.getPrincipal().getName();
-        //String user = "hardcoded";
-        return Response.status(Status.OK).header("Remote-User", user).build();
+        return Response.status(Status.OK).header(authlyUserHeader, user).build();
     }
 
 	public String buildRedirectUri(final String proto, final String host, final String uri) {
-
-		String redirect_uri = "";
 		try {
-
-			redirect_uri = URLEncoder.encode(MessageFormat.format("{0}://{1}{2}", proto, host, uri), "UTF-8");
-		} catch(UnsupportedEncodingException ex) {
-			//This should never happen
+			return URLEncoder.encode(MessageFormat.format("{0}://{1}{2}", proto, host, uri), "UTF-8");
+		} catch(UnsupportedEncodingException | IllegalArgumentException ex) {
+			LOGGER.log(Level.ERROR, "Unable to URL encode the redirect uri", ex);
+            // redirect to the index
+            return "/";
 		}
-		return redirect_uri;
 	}
 
 }

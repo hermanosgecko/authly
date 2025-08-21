@@ -34,11 +34,13 @@ services:
 #    - "traefik.frontend.auth.forward.authResponseHeaders=X-Forwarded-User"
     
   authly:
+    hostname: authly
     image: hermanosgecko/authly:latest
     environment:
      - QUARKUS_HTTP_AUTH_SESSION_ENCRYPTION_KEY=12345678901234567
      - QUARKUS_HTTP_AUTH_FORM_COOKIE_DOMAIN=podman.localhost
      - QUARKUS_SECURITY_USERS_EMBEDDED_USERS_TEST=test
+     - AUTHLY_HOST=http://auth.podman.localhost:8081
     networks:
       traefik:
     ports:

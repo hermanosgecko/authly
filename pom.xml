@@ -21,9 +21,9 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:git:git://github.com/hermanosgecko/authentik.git</connection>
-		<developerConnection>scm:git:git://github.com/hermanosgecko/authentik.git</developerConnection>
-		<url>https://github.com/hermanosgecko/authentik</url>
+		<connection>scm:git:git://github.com/hermanosgecko/authly.git</connection>
+		<developerConnection>scm:git:git://github.com/hermanosgecko/authly.git</developerConnection>
+		<url>https://github.com/hermanosgecko/authly</url>
 	</scm>
 
 	<properties>
@@ -48,10 +48,9 @@
 		<quarkus.container-image.name>authly</quarkus.container-image.name>
 		<quarkus.container-image.tag>latest</quarkus.container-image.tag>
 
-
 		<!-- DEPENDENCIES -->
+		<quarkus-qute-web.version>3.4.4</quarkus-qute-web.version>
 		<bootstrap.version>5.3.7</bootstrap.version>
-
 	</properties>
 
   	<dependencyManagement>
@@ -64,7 +63,6 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-
 		</dependencies>
 	</dependencyManagement>
 		
@@ -91,15 +89,11 @@
 			<artifactId>quarkus-web-dependency-locator</artifactId>
 		</dependency>
 
-		<!-- CODECS FOR PASSWORDS -->
-		<!-- FROM QUARKUS-BOM -->
+		<!-- THIS IS FOR SERVING THE LOGIN TEMPLATE-->
 		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk18on</artifactId>
+			<groupId>io.quarkiverse.qute.web</groupId>
+			<artifactId>quarkus-qute-web</artifactId>
+			<version>${quarkus-qute-web.version}</version>
 		</dependency>
 
 		<!-- BOOTSTRAP FOR UI -->

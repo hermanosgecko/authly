@@ -39,15 +39,16 @@ public class LogoutResource {
     SecurityIdentity identity;
 
     @POST
-    public Response logout() {
-        logger.log(Level.INFO, "Entering logout");
+    public Response doPost() {
+        logger.log(Level.DEBUG, "Entering");
+        
         if (identity.isAnonymous()) {
             throw new UnauthorizedException("Not authenticated");
         }
-        logger.log(Level.INFO, "User {0}", identity.getPrincipal().getName());
+        logger.log(Level.DEBUG, "Logging user \"{0}\" out", identity.getPrincipal().getName());
 
         URI redirectTo = UriBuilder.fromResource(IndexResource.class).build();
-        logger.log(Level.INFO, "Redirect URI {0}", redirectTo.toString());
+        logger.log(Level.DEBUG, "Redirect URI {0}", redirectTo.toString());
 
         FormAuthenticationMechanism.logout(identity); 
         return Response.status(Status.FOUND).location(redirectTo).build();

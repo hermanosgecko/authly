@@ -20,7 +20,7 @@ import java.lang.System.Logger.Level;
 
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
-//import io.quarkus.security.UnauthorizedException;
+import io.quarkus.security.UnauthorizedException;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -37,25 +37,22 @@ public class IndexResource {
     Template authenticated;
 
     @Inject
-    Template login;
-
-    @Inject
     SecurityIdentity identity;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance login(){
-        logger.log(Level.TRACE, "Entering login");
+    public TemplateInstance doGet(){
+        logger.log(Level.DEBUG, "Entering");
 
         // Check if a user is logged in
         if (identity.isAnonymous()) {
-            logger.log(Level.TRACE, "No user authenticated");
-            return login.instance();
-            //throw new UnauthorizedException("Not authenticated");
+            String message = "Not authenticated";
+            logger.log(Level.DEBUG, message);
+            throw new UnauthorizedException(message);
         }
         
         String name = identity.getPrincipal().getName();
-        logger.log(Level.TRACE, "User \"{0}\" is authenticated", name);
+        logger.log(Level.DEBUG, "User \"{0}\" is authenticated", name);
         return authenticated.data("name", name);
     }
 
