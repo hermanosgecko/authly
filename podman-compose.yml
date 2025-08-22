@@ -37,16 +37,19 @@ services:
     hostname: authly
     image: hermanosgecko/authly:latest
     environment:
-     - QUARKUS_HTTP_AUTH_SESSION_ENCRYPTION_KEY=12345678901234567
-     - QUARKUS_HTTP_AUTH_FORM_COOKIE_DOMAIN=podman.localhost
-     - QUARKUS_SECURITY_USERS_EMBEDDED_USERS_TEST=test
+#     - QUARKUS_HTTP_AUTH_SESSION_ENCRYPTION_KEY=12345678901234567
+#     - QUARKUS_HTTP_AUTH_FORM_COOKIE_DOMAIN=podman.localhost
+#     - QUARKUS_SECURITY_USERS_EMBEDDED_USERS_TEST=098f6bcd4621d373cade4e832627b4f6
+#     - QUARKUS_SECURITY_USERS_EMBEDDED_USERS_TEST=test
+     - AUTHLY_ENCRYPTION_KEY=12345678901234567
+     - AUTHLY_COOKIE_DOMAIN=podman.localhost
      - AUTHLY_HOST=http://auth.podman.localhost:8081
     networks:
       traefik:
     ports:
       - 8282:8080
     volumes:
-     - ${PWD}/htpasswd:/htpasswd:ro
+     - ./users.properties:/users.properties:ro
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.authly.rule=Host(`auth.podman.localhost`)"
