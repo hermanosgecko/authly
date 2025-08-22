@@ -1,5 +1,7 @@
 {#include index}
-<p>Hello {name ?: "world"}!</p>
-<form action="logout" method="POST">
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Logout</button>
-</form>
+<main class="form-signin w-100 m-auto">
+    <form action="logout" method="POST">        
+        <h1 class="h3 mb-3 fw-normal">Hello {name ?: "world"}!</h1>
+        <button class="btn btn-primary w-100 py-2" type="submit">Sign out</button>
+    </form>
+</main>
