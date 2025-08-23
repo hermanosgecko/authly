@@ -39,15 +39,10 @@
 		<!-- PLUGINS -->
 		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
 		<maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
-		<spring-boot.version>2.2.4.RELEASE</spring-boot.version>
 
 		<!-- QUARKUS -->
 		<quarkus.platform.version>3.25.3</quarkus.platform.version>
-		<quarkus.container-image.build>true</quarkus.container-image.build>
-		<quarkus.container-image.group>hermanosgecko</quarkus.container-image.group>
-		<quarkus.container-image.name>authly</quarkus.container-image.name>
-		<quarkus.container-image.tag>latest</quarkus.container-image.tag>
-
+				
 		<!-- DEPENDENCIES -->
 		<quarkus-qute-web.version>3.4.4</quarkus-qute-web.version>
 		<bootstrap.version>5.3.7</bootstrap.version>
@@ -70,19 +65,11 @@
 		<!-- QUARKUS -->
 		<dependency>
 			<groupId>io.quarkus</groupId>
-			<artifactId>quarkus-container-image-podman</artifactId>
+			<artifactId>quarkus-rest-qute</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-elytron-security-properties-file</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.quarkus</groupId>
-			<artifactId>quarkus-rest</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.quarkus</groupId>
-			<artifactId>quarkus-rest-qute</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.quarkus</groupId>
@@ -103,12 +90,12 @@
 			<version>${bootstrap.version}</version>
 		</dependency>
 
-		<!-- TEST DEPENDENCIES -->
-      <dependency>
-        <groupId>io.quarkus</groupId>
-        <artifactId>quarkus-junit5-mockito</artifactId>
-		<scope>test</scope>
-      </dependency>
+			<!-- TEST DEPENDENCIES -->
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-junit5-mockito</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 
@@ -155,40 +142,60 @@
 
 
 	<profiles>
+
 		<profile>
-			<id>DOCKER</id>
+			<id>container</id>
+			<activation>
+				<property>
+					<name>quarkus.container-image.build</name>
+					<value>true</value>
+				</property>
+			</activation>
 			<properties>
-				<docker-plugin.version>0.46.0</docker-plugin.version>
+				<quarkus.container-image.group>hermanosgecko</quarkus.container-image.group>
+				<quarkus.container-image.name>${project.artifactId}</quarkus.container-image.name>
+				<quarkus.container-image.tag>${project.version}</quarkus.container-image.tag>
 			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>io.fabric8</groupId>
-						<artifactId>docker-maven-plugin</artifactId>
-						<version>${docker-plugin.version}</version>
-						<configuration>
-							<images>
-								<image>
-									<name>%g/%a:%l</name>
-									<alias>auth</alias>
-									<build>
-										<dockerFile>${project.basedir}/Dockerfile</dockerFile>								
-									</build>
-								</image>
-							</images>
-						</configuration>
-						<executions>
-							<execution>
-								<id>docker:build</id>
-								<phase>package</phase>
-								<goals>
-									<goal>build</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
+		</profile>
+
+		<profile>
+			<id>docker</id>
+			<activation>
+				<property>
+					<name>quarkus.container-image.builder</name>
+					<value>docker</value>
+				</property>
+			</activation>
+			<properties>
+				<quarkus.container-image.build>true</quarkus.container-image.build>
+				<!--<quarkus.docker.buildx.platfrom>linux/amd64,linux/arm64</quarkus.docker.buildx.platfrom>-->
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>io.quarkus</groupId>
+					<artifactId>quarkus-container-image-docker</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+
+		<profile>
+			<id>podman</id>
+			<activation>
+				<property>
+					<name>quarkus.container-image.builder</name>
+					<value>podman</value>
+				</property>
+			</activation>
+			<properties>
+				<quarkus.container-image.build>true</quarkus.container-image.build>
+				<!--<quarkus.podman.platform>linux/amd64,linux/arm64</quarkus.podman.platform>-->
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>io.quarkus</groupId>
+					<artifactId>quarkus-container-image-podman</artifactId>
+				</dependency>
+			</dependencies>
 		</profile>
 
 		<profile>
@@ -222,30 +229,6 @@
 			</build>
 		</profile>
 		
-		<profile>
-			<id>coveralls</id>
-			<properties>
-				<org.eluder.coveralls.version>4.3.0</org.eluder.coveralls.version>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.eluder.coveralls</groupId>
-						<artifactId>coveralls-maven-plugin</artifactId>
-						<version>${org.eluder.coveralls.version}</version>
-						<executions>
-							<execution>
-								<id>report</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>report</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 	</profiles>
 
 </project>
