@@ -42,7 +42,7 @@
 
 		<!-- QUARKUS -->
 		<quarkus.platform.version>3.25.3</quarkus.platform.version>
-				
+		
 		<!-- DEPENDENCIES -->
 		<quarkus-qute-web.version>3.4.4</quarkus-qute-web.version>
 		<bootstrap.version>5.3.7</bootstrap.version>
@@ -144,21 +144,6 @@
 	<profiles>
 
 		<profile>
-			<id>container</id>
-			<activation>
-				<property>
-					<name>quarkus.container-image.build</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<properties>
-				<quarkus.container-image.group>hermanosgecko</quarkus.container-image.group>
-				<quarkus.container-image.name>${project.artifactId}</quarkus.container-image.name>
-				<quarkus.container-image.tag>${project.version}</quarkus.container-image.tag>
-			</properties>
-		</profile>
-
-		<profile>
 			<id>docker</id>
 			<activation>
 				<property>
@@ -168,6 +153,9 @@
 			</activation>
 			<properties>
 				<quarkus.container-image.build>true</quarkus.container-image.build>
+				<quarkus.container-image.group>hermanosgecko</quarkus.container-image.group>
+				<quarkus.container-image.name>${project.artifactId}</quarkus.container-image.name>
+				<quarkus.container-image.tag>${project.version}</quarkus.container-image.tag>
 				<!--<quarkus.docker.buildx.platfrom>linux/amd64,linux/arm64</quarkus.docker.buildx.platfrom>-->
 			</properties>
 			<dependencies>
@@ -188,6 +176,9 @@
 			</activation>
 			<properties>
 				<quarkus.container-image.build>true</quarkus.container-image.build>
+				<quarkus.container-image.group>hermanosgecko</quarkus.container-image.group>
+				<quarkus.container-image.name>${project.artifactId}</quarkus.container-image.name>
+				<quarkus.container-image.tag>${project.version}</quarkus.container-image.tag>
 				<!--<quarkus.podman.platform>linux/amd64,linux/arm64</quarkus.podman.platform>-->
 			</properties>
 			<dependencies>
