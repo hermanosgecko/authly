@@ -2,11 +2,12 @@
 # https://docs.github.com/en/actions/reference/workflows-and-actions/contexts
 # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#release
 
-name: release
+name: build
 
 on:
-  release:
-    types: [created]
+  push:
+#    branches:
+#      - main 
 
 jobs:
   build:
@@ -15,7 +16,7 @@ jobs:
 
     env:
       QUARKUS_CONTAINER_IMAGE_BUILD: true
-      QUARKUS_CONTAINER_IMAGE_PUSH: true 
+      QUARKUS_CONTAINER_IMAGE_PUSH: false
       QUARKUS_CONTAINER_IMAGE_REGISTRY: "ghcr.io"
       QUARKUS_CONTAINER_IMAGE_USERNAME: ${{ github.actor }}
       QUARKUS_CONTAINER_IMAGE_PASSWORD: ${{ github.token }}
@@ -26,6 +27,17 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+
+    - name: Echo Environment Variables
+      run: |
+        echo "Container Image Build: ${{ env.QUARKUS_CONTAINER_IMAGE_BUILD }}"
+        echo "Container Image Push: ${{ env.QUARKUS_CONTAINER_IMAGE_PUSH }}"
+        echo "Container Image Registry: ${{ env.QUARKUS_CONTAINER_IMAGE_REGISTRY }}"
+        echo "Container Image Username: ${{ env.QUARKUS_CONTAINER_IMAGE_USERNAME }}"
+        echo "Container Image Password: ${{ env.QUARKUS_CONTAINER_IMAGE_PASSWORD }}"
+        echo "Container Image Tag: ${{ env.QUARKUS_CONTAINER_IMAGE_TAG }}"
+        echo "Container Image Additional Tags: ${{ env.QUARKUS_CONTAINER_IMAGE_ADDITIONAL_TAGS }}"
+        echo "Container Image Platforms: ${{ env.QUARKUS_PODMAN_PLATFORM }}"
 
     - name: Set up JDK
       uses: actions/setup-java@v4
