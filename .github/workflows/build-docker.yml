@@ -71,7 +71,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v6
       with:
-        context: target/
+        context: .
         file: src/main/docker/Dockerfile.jvm
         push: false
         tags: ${{ steps.meta.outputs.tags }}
