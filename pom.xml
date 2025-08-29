@@ -6,7 +6,7 @@
 
 	<groupId>com.github.hermanosgecko</groupId>
 	<artifactId>authly</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3</version>
 	<packaging>jar</packaging>
 
 	<name>authly</name>
