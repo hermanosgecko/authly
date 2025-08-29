@@ -1,13 +1,11 @@
-# https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax
-# https://docs.github.com/en/actions/reference/workflows-and-actions/contexts
-# https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#release
-
-name: build
+name: build-docker
 
 on:
   push:
-#    branches:
-#      - main 
+    branches:
+      - main 
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -15,29 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      QUARKUS_CONTAINER_IMAGE_BUILD: true
-      QUARKUS_CONTAINER_IMAGE_PUSH: false
-      QUARKUS_CONTAINER_IMAGE_REGISTRY: "ghcr.io"
-      QUARKUS_CONTAINER_IMAGE_USERNAME: ${{ github.actor }}
-      QUARKUS_CONTAINER_IMAGE_PASSWORD: ${{ github.token }}
-      QUARKUS_CONTAINER_IMAGE_TAG: latest
-      QUARKUS_CONTAINER_IMAGE_ADDITIONAL_TAGS: ${{ github.ref_name }} 
-      QUARKUS_PODMAN_PLATFORM: "linux/amd64,linux/arm64"
+      DOCKER_BUILD_PLATFORMS: linux/amd64,linux/arm64
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
-
-    - name: Echo Environment Variables
-      run: |
-        echo "Container Image Build: ${{ env.QUARKUS_CONTAINER_IMAGE_BUILD }}"
-        echo "Container Image Push: ${{ env.QUARKUS_CONTAINER_IMAGE_PUSH }}"
-        echo "Container Image Registry: ${{ env.QUARKUS_CONTAINER_IMAGE_REGISTRY }}"
-        echo "Container Image Username: ${{ env.QUARKUS_CONTAINER_IMAGE_USERNAME }}"
-        echo "Container Image Password: ${{ env.QUARKUS_CONTAINER_IMAGE_PASSWORD }}"
-        echo "Container Image Tag: ${{ env.QUARKUS_CONTAINER_IMAGE_TAG }}"
-        echo "Container Image Additional Tags: ${{ env.QUARKUS_CONTAINER_IMAGE_ADDITIONAL_TAGS }}"
-        echo "Container Image Platforms: ${{ env.QUARKUS_PODMAN_PLATFORM }}"
 
     - name: Set up JDK
       uses: actions/setup-java@v4
@@ -47,4 +27,42 @@ jobs:
         cache: 'maven'
 
     - name: Build with Maven
-      run: mvn -P podman --batch-mode clean package --file pom.xml
+      run: mvn --batch-mode clean package --file pom.xml
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      with: 
+        platforms: ${{ env.DOCKER_BUILD_PLATFORMS }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with: 
+        platforms: ${{ env.DOCKER_BUILD_PLATFORMS }}
+
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ github.repository }}
+        tags: |
+          type=sha
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=ref,event=branch
+          type=ref,event=tag
+
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        platforms: ${{ env.DOCKER_BUILD_PLATFORMS }}

@@ -150,10 +150,7 @@
 			<properties>
 				<quarkus.container-image.build>true</quarkus.container-image.build>
 				<quarkus.container-image.builder>docker</quarkus.container-image.builder>
-				<!--<quarkus.container-image.group>hermanosgecko</quarkus.container-image.group>-->
-				<!--<quarkus.container-image.name>${project.artifactId}</quarkus.container-image.name>-->
-				<!--<quarkus.container-image.tag>${project.version}</quarkus.container-image.tag>-->
-				<!--<quarkus.docker.buildx.platfrom>linux/amd64,linux/arm64</quarkus.docker.buildx.platfrom>-->
+				<quarkus.docker.dockerfile-jvm-path>Dockerfile</quarkus.docker.dockerfile-jvm-path>
 			</properties>
 			<dependencies>
 				<dependency>
@@ -168,10 +165,7 @@
 			<properties>
 				<quarkus.container-image.build>true</quarkus.container-image.build>
 				<quarkus.container-image.builder>podman</quarkus.container-image.builder>
-				<!--<quarkus.container-image.group>hermanosgecko</quarkus.container-image.group>-->
-				<!--<quarkus.container-image.name>${project.artifactId}</quarkus.container-image.name>-->
-				<!--<quarkus.container-image.tag>${project.version}</quarkus.container-image.tag>-->
-				<!--<quarkus.podman.platform>linux/amd64,linux/arm64</quarkus.podman.platform>-->
+				<quarkus.podman.dockerfile-jvm-path>Dockerfile</quarkus.podman.dockerfile-jvm-path>
 			</properties>
 			<dependencies>
 				<dependency>
