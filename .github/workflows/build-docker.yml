@@ -38,7 +38,6 @@ jobs:
         echo "Container Image Tag: ${{ env.QUARKUS_CONTAINER_IMAGE_TAG }}"
         echo "Container Image Additional Tags: ${{ env.QUARKUS_CONTAINER_IMAGE_ADDITIONAL_TAGS }}"
         echo "Container Image Platforms: ${{ env.QUARKUS_PODMAN_PLATFORM }}"
-        echo "tags: 
 
     - name: Set up JDK
       uses: actions/setup-java@v4
